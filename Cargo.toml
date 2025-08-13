@@ -1,0 +1,9 @@
+[package]
+name = "bw-crm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+argon2 = "0.5.3"
+sqlx = { version = "0.8.6", features = [ "runtime-tokio", "sqlite", "postgres" ] }
+tokio = { version = "1.47.1", features = ["full"] }
