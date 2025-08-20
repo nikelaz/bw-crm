@@ -3,13 +3,13 @@ use sqlx::Row;
 use argon2::password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString};
 use argon2::Argon2;
 
-pub(crate) struct UserModel<'a> {
-    pool: &'a SqlitePool,
-    argon2: Argon2<'a>,
+pub(crate) struct UserModel {
+    pool: SqlitePool,
+    argon2: Argon2<'static>,
 }
 
-impl<'a> UserModel<'a> {
-    pub fn new(pool: &'a SqlitePool) -> Self {
+impl UserModel {
+    pub fn new(pool: SqlitePool) -> Self {
         UserModel {
             pool,
             argon2: Argon2::default(),
@@ -39,7 +39,7 @@ impl<'a> UserModel<'a> {
         sqlx::query("INSERT INTO users (username, password) VALUES (?, ?)")
             .bind(username)
             .bind(hashed_password)
-            .execute(self.pool)
+            .execute(&self.pool)
             .await
             .map_err(|e| format!("Failed to create user: {}", e))?;
 
@@ -49,7 +49,7 @@ impl<'a> UserModel<'a> {
     pub async fn login(&self, username: &str, password: &str) -> Result<(), String> {
         let row = sqlx::query("SELECT password FROM users WHERE username = ?")
             .bind(username)
-            .fetch_one(self.pool)
+            .fetch_one(&self.pool)
             .await
             .map_err(|_| "Invalid username or password".to_string())?;
     
