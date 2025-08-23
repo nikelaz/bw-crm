@@ -1,9 +1,13 @@
 name: Rust
 
+permissions:
+  contents: write
+
 on:
+  workflow_dispatch:
   push:
     tags:
-      - 'v*'  # trigger on version tags like v1.0.0
+      - 'v*'
 
 env:
   CARGO_TERM_COLOR: always
