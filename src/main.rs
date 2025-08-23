@@ -6,7 +6,7 @@ use std::sync::Arc;
 use axum::routing::post;
 use axum::Router;
 use user_model::UserModel;
-use users_controller::login;
+use users_controller::{login, verify_token};
 
 async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     // Create the users table
@@ -60,6 +60,7 @@ async fn main() {
 
     let router = Router::new()
         .route("/api/v1/users/login", post(login))
+        .route("/api/v1/users/verify", post(verify_token))
         .with_state(state);
 
     let listener = match tokio::net::TcpListener::bind("0.0.0.0:3000").await {
