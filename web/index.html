@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Login - Budget Warden CRM</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/styles/main.css" />
+    <script src="/scripts/login.js"></script>
+  </head>
+  <body class="-mh-vh">
+    <main class="-df -mh-vh -ai-c -jc-c">
+      <div class="-df -fd-c -gap-md -bg-lightgrey -br-md -p-lg">
+        <h1 class="-fs-xl -fw-500">Login</h1>
+        <form class="-df -fd-c -gap-md js-login-form">
+          <div class="-df -fd-c -gap-xs">
+            <label class="-db" for="username">Username</label>
+            <input class="-db" type="text" id="username" name="username" required />
+          </div>
+
+          <div class="-df -fd-c -gap-xs">
+            <label class="-db" for="password">Password</label>
+            <input class="-db" type="password" id="password" name="password" required />
+          </div>
+
+          <button type="submit">Login</button>
+
+          <progress class="-db -w-100 js-login-progress" hidden></progress>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>

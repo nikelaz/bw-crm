@@ -67,10 +67,9 @@ impl UserModel {
     
         let stored_hash: String = row.get("password");
     
-        if self.verify_password(password, &stored_hash)? {
-            Ok(())
-        } else {
-            Err("Invalid username or password".to_string())
+        match self.verify_password(password, &stored_hash) {
+            Ok(true) => Ok(()),
+            _ => Err("Invalid username or password".to_string()),
         }
     }
 }

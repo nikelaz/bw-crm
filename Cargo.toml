@@ -6,7 +6,10 @@ edition = "2024"
 [dependencies]
 argon2 = "0.5.3"
 axum = "0.8.4"
+chrono = "0.4.41"
+dotenv = "0.15.0"
 jsonwebtoken = "9.3.1"
 serde = "1.0.219"
 sqlx = { version = "0.8.6", features = [ "runtime-tokio", "sqlite", "postgres" ] }
 tokio = { version = "1.47.1", features = ["full"] }
+tower-http = { version = "0.6.6", features = ["fs"] }

@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Clients - Budget Warden CRM</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link type="text/css" rel="stylesheet" href="/styles/main.css" />
+    <script src="/scripts/clients.js"></script>
+  </head>
+  <body class="-mh-vh -df -fd-c">
+    <header class="header">
+      <div class="container -df -ai-c -jc-sb -p-lg">
+        <a href="/clients.html">Clients</a>
+        <button type="button" class="js-logout-button -mt-auto">Logout</button>
+      </div>
+    </header>
+    <main class="container -p-lg">
+      <h1 class="-fs-xl -mb-md">Clients</h1>
+      <p class="-mb-md">Total Records: <span class="js-total-records">0</span></p>
+      <div class="table__wrap">
+        <table class="table js-clients-table" hidden>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Country</th>
+              <th>Currency</th>
+            </tr>
+          </thead>
+          <tbody class="js-clients-table-tbody"></tbody>
+        </table>
+      </div>
+      <progress class="js-clients-table-loading" hidden></progress>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+@layer utils {
+  /* Display */
+  .-db {
+    display: block;
+  }
+  .-df {
+    display: flex;
+  }
+
+  /* Position */
+  .-pos-sticky {
+    position: sticky;
+  }
+
+  .-t-0 {
+    top: 0;
+  }
+
+  /* Fonts */
+  .-fs-md {
+    font-size: 1rem;
+  }
+
+  .-fs-lg {
+    font-size: 1.1rem;
+  }
+
+  .-fs-xl {
+    font-size: 1.25rem;
+  }
+  
+  .-fw-500 {
+    font-weight: 500;
+  }
+
+  /* Dimensions */
+  .-w-100 {
+    width: 100%;
+  }
+
+  .-h-100 {
+    height: 100%;
+  }
+
+  .-mh-vh {
+    min-height: 100vh;
+  }
+
+  /* Layout */
+  .-fd-c {
+    flex-direction: column;
+  }
+
+  .-jc-c {
+    justify-content: center;
+  }
+
+  .-jc-sb {
+    justify-content: space-between;
+  }
+
+  .-ai-c {
+    align-items: center;
+  }
+
+  /* Gap */
+  .-gap-xs {
+    gap: 0.5rem;
+  }
+
+  .-gap-md {
+    gap: 1rem;
+  }
+
+  /* Padding */
+  .-p-lg {
+    padding: 1.5rem;
+  }
+
+  /* Margin */
+  .-mt-auto {
+    margin-top: auto;
+  }
+
+  .-mb-md {
+    margin-bottom: 1rem;
+  }
+  
+  /* Background */
+  .-bg-lightgrey {
+    background-color: #f5f5f5;
+  }
+
+  /* Border Radius */
+  .-br-md {
+    border-radius: 5px;
+  }
+}
