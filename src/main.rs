@@ -1,15 +1,12 @@
+pub(crate) mod users_controller;
 pub(crate) mod user_model;
 
 use sqlx::sqlite::SqlitePool;
 use std::sync::Arc;
+use axum::routing::post;
+use axum::Router;
 use user_model::UserModel;
-use axum::{
-    routing::{post},
-    http::StatusCode,
-    Json, Router,
-};
-use axum::extract::State;
-use serde::{Deserialize, Serialize};
+use users_controller::login;
 
 async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     // Create the users table
@@ -27,74 +24,53 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 }
 
 #[derive(Clone)]
-struct AppState {
+pub(crate) struct AppState {
     user_model: Arc<UserModel>,
 }
 
 #[tokio::main]
 async fn main() {
-    let pool = SqlitePool::connect("sqlite::memory:")
-        .await
-        .unwrap();
+    let pool = match SqlitePool::connect("sqlite::memory:").await {
+        Ok(pool) => pool,
+        Err(e) => {
+            eprintln!("Failed to connect to the database: {}", e);
+            return;
+        },
+    };
 
     println!("Database Connected");
 
-    seed_database(&pool).await.unwrap();
+    if let Err(e) = seed_database(&pool).await {
+        eprintln!("Failed to seed database: {}", e);
+        return;
+    }
 
     let state = AppState {
         user_model: Arc::new(UserModel::new(pool.clone())),
     };
 
-    state.user_model.create_user("admin", "123qwerty").await.unwrap();
+    println!("Database Seeded (if needed)");
 
-    match state.user_model.login("admin", "123qwerty").await {
-        Ok(_) => println!("Login successful"),
-        Err(e) => println!("Login failed: {}", e),
+    if let Err(e) = state.user_model.create_user("admin", "123qwerty").await {
+        eprintln!("Failed to create admin user: {}", e);
+        return;
     }
+
+    println!("Admin user created (if needed)");
 
     let router = Router::new()
         .route("/api/v1/users/login", post(login))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = match tokio::net::TcpListener::bind("0.0.0.0:3000").await {
+        Ok(listener) => listener,
+        Err(e) => {
+            eprintln!("Failed to bind to address: {}", e);
+            return;
+        },
+    };
 
     axum::serve(listener, router).await.unwrap();
 
     pool.close().await;
 }
-
-#[derive(Deserialize)]
-struct PayloadLogin {
-    username: String,
-    password: String,
-}
-
-#[derive(Serialize)]
-struct PayloadResponse {
-    message: String,
-}
-
-async fn login(State(state): State<AppState>, Json(payload): Json<PayloadLogin>) -> (StatusCode, Json<PayloadResponse>) {
-    let response_message: String;
-
-    match state.user_model.login(payload.username.as_str(), payload.password.as_str()).await {
-        Ok(_) => response_message = "Login successful".to_string(),
-        Err(e) => response_message = format!("Login failed: {}", e),
-    }
-
-    (StatusCode::CREATED, Json(PayloadResponse { message: response_message }))
-}
-
-/* This is how you query rows 
-let rows = sqlx::query("SELECT id, username, password FROM users")
-.fetch_all(&pool)
-.await
-.unwrap();
-
-for row in rows {
-let id: i64 = row.get("id");
-let username: String = row.get("username");
-let password: String = row.get("password");
-println!("id: {}, username: {}, password: {}", id, username, password);
-}
-*/

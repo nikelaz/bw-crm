@@ -36,6 +36,18 @@ impl UserModel {
         let hashed_password = self.hash_password(password)
             .map_err(|e| format!("Failed to hash password: {}", e))?;
 
+        let user_exists = sqlx::query("SELECT COUNT(*) FROM users WHERE username = ?")
+            .bind(username)
+            .fetch_one(&self.pool)
+            .await
+            .map_err(|e| format!("Failed to query user existence: {}", e))?
+            .get::<i64, _>(0) > 0;
+
+        if user_exists {
+            return Err("User already exists".to_string());
+        }
+
+        // Insert the new user
         sqlx::query("INSERT INTO users (username, password) VALUES (?, ?)")
             .bind(username)
             .bind(hashed_password)
