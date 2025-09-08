@@ -12,7 +12,7 @@ pub(crate) struct Client {
     pub email: String,
     pub first_name: String,
     pub last_name: String,
-    pub country: String,
+    pub country: Option<String>,
     pub currency: String,
 }
 
