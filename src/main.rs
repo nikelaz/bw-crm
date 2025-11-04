@@ -2,6 +2,7 @@ pub(crate) mod user_model;
 pub(crate) mod client_model;
 pub(crate) mod user_controller;
 pub(crate) mod client_controller;
+pub(crate) mod sync_manager;
 
 use sqlx::sqlite::SqlitePool;
 use sqlx::PgPool;
@@ -15,6 +16,7 @@ use user_model::UserModel;
 use client_model::ClientModel;
 use user_controller::{login, verify_token};
 use client_controller::get_clients;
+use sync_manager::SyncManager;
 
 async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     sqlx::query(
@@ -22,6 +24,21 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             id INTEGER PRIMARY KEY,
             username TEXT NOT NULL,
             password TEXT NOT NULL
+        )"
+    )
+        .execute(pool)
+        .await?;
+
+    sqlx::query(
+        "CREATE TABLE IF NOT EXISTS clients (
+            id INTEGER PRIMARY KEY,
+            email TEXT NOT NULL,
+            first_name TEXT,
+            last_name TEXT,
+            country TEXT,
+            currency TEXT,
+            notes TEXT,
+            do_not_message INTEGER NOT NULL DEFAULT 0
         )"
     )
         .execute(pool)
@@ -43,13 +60,22 @@ async fn main() {
 
     dotenv().ok();
 
-    let port = env::var("PORT").expect("PORT environment variable");
-    let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET environment variable");
-    let postgres_url = env::var("POSTGRES_URL").expect("POSTGRES_URL environment variable");
-    let admin_username = env::var("ADMIN_USERNAME").expect("ADMIN_USERNAME environment variable");
-    let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD environment variable");
+    let port = env::var("PORT")
+        .expect("PORT environment variable");
+    let jwt_secret = env::var("JWT_SECRET")
+        .expect("JWT_SECRET environment variable");
+    let postgres_url = env::var("POSTGRES_URL")
+        .expect("POSTGRES_URL environment variable");
+    let admin_username = env::var("ADMIN_USERNAME")
+        .expect("ADMIN_USERNAME environment variable");
+    let admin_password = env::var("ADMIN_PASSWORD")
+        .expect("ADMIN_PASSWORD environment variable");
 
-    println!("Environment Variables Loaded \n PORT: {} \n ADMIN_USERNAME: {}", port, admin_username);
+    println!(
+        "Environment Variables Loaded \n PORT: {} \n ADMIN_USERNAME: {}",
+        port,
+        admin_username
+    );
 
     let sqlite_pool = match SqlitePool::connect("sqlite://crm.db").await {
         Ok(pool) => pool,
@@ -74,9 +100,17 @@ async fn main() {
         return;
     }
 
+    let sync_manager = SyncManager::new(pg_pool.clone(), sqlite_pool.clone()); 
+
+
+    if let Err(e) = sync_manager.sync_clients().await {
+        eprintln!("Failed to sync clients: {}", e);
+        return;
+    }
+
     let state = AppState {
         user_model: Arc::new(UserModel::new(sqlite_pool.clone())),
-        client_model: Arc::new(ClientModel::new(pg_pool.clone())),
+        client_model: Arc::new(ClientModel::new(sqlite_pool.clone())),
         jwt_secret,
     };
 
