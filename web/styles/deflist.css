@@ -1,0 +1,18 @@
+@layer components {
+  .deflist {
+    max-width: 680px;
+  }
+
+  .deflist dd {
+    margin-left: 0;
+    padding: 0.7em 1em;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0.7rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .deflist dt {
+    padding-left: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+}

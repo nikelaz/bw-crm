@@ -19,7 +19,20 @@ impl SyncManager {
     pub async fn sync_clients(&self) -> Result<(), Box<dyn Error>> {
         println!("Synchronizing Clients");
 
-        let rows = sqlx::query("SELECT * FROM \"user\"")
+        let rows = sqlx::query(
+            r#"
+                SELECT 
+                    id,
+                    email,
+                    "firstName",
+                    "lastName",
+                    country,
+                    currency,
+                    created::TEXT AS created,
+                    last_activity_date::TEXT AS last_activity_date
+                FROM "user"
+            "#
+        )
             .fetch_all(&self.pg_pool)
             .await
             .map_err(|e| format!("Failed to fetch users: {}", e))?;
@@ -35,6 +48,8 @@ impl SyncManager {
                 currency: row.get("currency"),
                 notes: None,
                 do_not_message: None,
+                created: row.get("created"),
+                last_activity_date: row.get("last_activity_date"),
             })
             .collect();
 
@@ -47,9 +62,11 @@ impl SyncManager {
                         first_name,
                         last_name,
                         country,
-                        currency
+                        currency,
+                        created,
+                        last_activity_date
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                     ON CONFLICT (id) DO NOTHING
                 "#
             )
@@ -59,6 +76,8 @@ impl SyncManager {
                 .bind(&client.last_name)
                 .bind(&client.country)
                 .bind(&client.currency)
+                .bind(&client.created)
+                .bind(&client.last_activity_date)
                 .execute(&self.sqlite_pool)
                 .await
                 .map_err(|e| {

@@ -32,6 +32,12 @@ async function fetchClients() {
   }
 }
 
+function tableRowClick(event) {
+  const href = event.currentTarget.dataset.href;
+  if (!href) return;
+  window.location.href = href;
+}
+
 function populateClientsTable(clients) {
   const clientsTable = document.querySelector('.js-clients-table');
   const clientsTableBody = clientsTable.querySelector('.js-clients-table-tbody');
@@ -41,6 +47,8 @@ function populateClientsTable(clients) {
 
   clients.forEach((client) => {
     const tr = document.createElement('tr');
+    tr.classList.add("-cursor-pointer");
+    tr.dataset.href = `/client-details.html?id=${client.id}`;
 
     const tdId = document.createElement('td');
     tdId.textContent = client.id;
@@ -61,11 +69,9 @@ function populateClientsTable(clients) {
     const tdCountry = document.createElement('td');
     tdCountry.textContent = client.country;
     tr.appendChild(tdCountry);
-    
-    const tdCurrency = document.createElement('td');
-    tdCurrency.textContent = client.currency;
-    tr.appendChild(tdCurrency);
 
+    tr.addEventListener("click", tableRowClick);
+    
     clientsTableBody.appendChild(tr);
   });
 

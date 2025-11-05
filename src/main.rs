@@ -15,7 +15,7 @@ use dotenv::dotenv;
 use user_model::UserModel;
 use client_model::ClientModel;
 use user_controller::{login, verify_token};
-use client_controller::get_clients;
+use client_controller::{get_clients, get_client, update_client};
 use sync_manager::SyncManager;
 
 async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
@@ -38,7 +38,9 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             country TEXT,
             currency TEXT,
             notes TEXT,
-            do_not_message INTEGER NOT NULL DEFAULT 0
+            do_not_message INTEGER NOT NULL DEFAULT 0,
+            created TEXT,
+            last_activity_date TEXT
         )"
     )
         .execute(pool)
@@ -124,6 +126,7 @@ async fn main() {
 
     let router = Router::new()
         .route("/api/v1/clients", get(get_clients))
+        .route("/api/v1/clients/{id}", get(get_client).put(update_client))
         .route("/api/v1/users/login", post(login))
         .route("/api/v1/users/verify", post(verify_token))
         .fallback_service(ServeDir::new("web"))
