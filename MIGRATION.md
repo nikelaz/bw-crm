@@ -1,9 +1,30 @@
-On deploy the Postgres DB (Production) needs to be updated to include
-created
-last_activity_date
+## Migration
 
-timestamp type fields
+```bash
+podman exec -it <container_name_or_id> psql -U <username> -d bw
+```
 
-last_activity_date can be null
+```sql
+ALTER TABLE "user"
+ADD COLUMN created TIMESTAMP NOT NULL DEFAULT now(),
+ADD COLUMN last_activity_date TIMESTAMP NULL;
+```
 
-created can be backfilled with today's date for all old records
+```sql
+UPDATE "user"
+SET created = now()
+WHERE created IS NULL;
+```
+
+## Verification
+
+```sql
+SELECT * FROM "user" LIMIT 5;
+```
+
+## Description
+
+Two new columns in the `user` table:
+
+- `created` - timestamp; backfilled with today's date for old records;
+- last_activity_date - timestamp;
