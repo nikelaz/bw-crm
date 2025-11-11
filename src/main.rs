@@ -3,6 +3,9 @@ pub(crate) mod client_model;
 pub(crate) mod user_controller;
 pub(crate) mod client_controller;
 pub(crate) mod sync_manager;
+pub(crate) mod email;
+pub(crate) mod email_model;
+pub(crate) mod email_controller;
 
 use sqlx::sqlite::SqlitePool;
 use sqlx::PgPool;
@@ -17,6 +20,8 @@ use client_model::ClientModel;
 use user_controller::{login, verify_token};
 use client_controller::{get_clients, get_client, update_client};
 use sync_manager::SyncManager;
+use email_model::EmailModel;
+use email_controller::{get_emails, get_email, create_email};
 
 async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     sqlx::query(
@@ -46,6 +51,22 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         .execute(pool)
         .await?;
 
+    sqlx::query(
+        "CREATE TABLE IF NOT EXISTS emails (
+            id INTEGER PRIMARY KEY,
+            from_name TEXT,
+            from_email TEXT,
+            to_name TEXT,
+            to_email TEXT,
+            subject TEXT,
+            body TEXT,
+            timestamp TEXT
+        )"
+    )
+        .execute(pool)
+        .await?;
+
+
     Ok(())
 }
 
@@ -53,6 +74,7 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 pub(crate) struct AppState {
     user_model: Arc<UserModel>,
     client_model: Arc<ClientModel>,
+    email_model: Arc<EmailModel>,
     jwt_secret: String,
 }
 
@@ -113,6 +135,7 @@ async fn main() {
     let state = AppState {
         user_model: Arc::new(UserModel::new(sqlite_pool.clone())),
         client_model: Arc::new(ClientModel::new(sqlite_pool.clone())),
+        email_model: Arc::new(EmailModel::new(sqlite_pool.clone())),
         jwt_secret,
     };
 
@@ -127,6 +150,8 @@ async fn main() {
     let router = Router::new()
         .route("/api/v1/clients", get(get_clients))
         .route("/api/v1/clients/{id}", get(get_client).put(update_client))
+        .route("/api/v1/emails", get(get_emails).post(create_email))
+        .route("/api/v1/emails/{id}", get(get_email))
         .route("/api/v1/users/login", post(login))
         .route("/api/v1/users/verify", post(verify_token))
         .fallback_service(ServeDir::new("web"))

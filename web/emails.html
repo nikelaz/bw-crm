@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Clients - Budget Warden CRM</title>
+    <title>Emails - Budget Warden CRM</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link type="text/css" rel="stylesheet" href="/styles/main.css" />
-    <script src="/scripts/clients.js"></script>
+    <script src="/scripts/emails.js"></script>
   </head>
   <body class="-mh-vh -df -fd-c">
     <header class="header">
@@ -16,30 +16,27 @@
       </div>
     </header>
     <main class="container -p-lg">
-      <h1 class="-fs-xl -mb-md">Clients</h1>
-      <p class="-mb-md">Total Records: <span class="js-total-records">0</span></p>
+      <h1 class="-fs-xl -mb-md">Emails</h1>
 
       <input type="text" placeholder="Search" class="js-filter" />
 
       <div class="table__wrap">
-        <table class="table js-clients-table" hidden>
+        <table class="table js-emails-table" hidden>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Email</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Country</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Date</th>
             </tr>
           </thead>
-          <tbody class="js-clients-table-tbody"></tbody>
+          <tbody class="js-emails-table-tbody"></tbody>
         </table>
       </div>
 
       <div class="pagination js-pagination">
       </div>
 
-      <progress class="js-clients-table-loading" hidden></progress>
+      <progress class="js-emails-table-loading" hidden></progress>
     </main>
   </body>
 </html>

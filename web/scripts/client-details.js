@@ -37,7 +37,7 @@ async function fetchClient(id) {
 
 function textsert(sel, content) {
   const el = document.querySelector(sel);
-  if (el) el.innerHTML = content;
+  if (el) el.innerHTML = content || "N/A";
 }
 
 function boxcheck(sel, checked) {
@@ -51,7 +51,6 @@ function valuert(sel, val) {
 }
 
 function render(client) {
-  console.log("client", client);
   textsert(".js-id", client.id);
   textsert(".js-email", client.email);
   textsert(".js-first-name", client.first_name);
@@ -59,9 +58,15 @@ function render(client) {
   textsert(".js-country", client.country);
   textsert(".js-currency", client.currency);
   textsert(".js-created", client.created);
-  textsert(".js-last-activity-date", client.last_activity_date || "N/A");
+  textsert(".js-last-activity-date", client.last_activity_date);
   boxcheck(".js-do-not-message", client.do_not_message);
   valuert(".js-notes", client.notes);
+
+  const breadcrumbEnd = document.querySelector(".js-breadcrumb-end");
+  if (breadcrumbEnd) {
+    breadcrumbEnd.href = `/client-details.html?id=${client.id}`;
+    breadcrumbEnd.innerHTML = `${client.first_name} ${client.last_name}`;
+  }
 
   const loader = document.querySelector(".js-loader");
   const content = document.querySelector(".js-content");
@@ -89,7 +94,7 @@ async function updateClient(id, payload) {
 
   if (req.ok) {
     const res = await req.json();
-    alert(res.message || "Client updated successfully!");
+    alert(res.message || "Client updated successfully.");
     return true;
   } else {
     try {

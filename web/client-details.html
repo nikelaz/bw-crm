@@ -11,6 +11,7 @@
     <header class="header">
       <div class="container -df -ai-c -jc-sb -p-lg">
         <a href="/clients.html">Clients</a>
+        <a href="/emails.html">Emails</a>
         <button type="button" class="js-logout-button -mt-auto">Logout</button>
       </div>
     </header>
@@ -18,7 +19,11 @@
       <progress class="js-loader"></progress>
 
       <div class="js-content" hidden>
-        <h1 class="-fs-xl -mb-md">Client</h1>
+        <nav class="breadcrumb">
+          <a href="/clients.html">Clients</a>
+          <span>/</span>
+          <a href="/client-details.html" class="js-breadcrumb-end">Client Details</a>
+        </nav>
         <form class="js-form">
           <dl class="deflist">
             <dt>ID:</dt>

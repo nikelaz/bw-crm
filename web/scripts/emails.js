@@ -1,6 +1,6 @@
-let cachedClients;
-let filteredClients;
-let clients;
+let cachedEmails;
+let filteredEmails;
+let emails;
 let currentPage = 1;
 let totalPages = 1;
 const PER_PAGE = 20;
@@ -17,7 +17,7 @@ function logout() {
   window.location.href = '/';
 }
 
-async function fetchClients() {
+async function fetchEmails() {
   const reqOptions = {
     method: 'GET',
     headers: {
@@ -26,12 +26,12 @@ async function fetchClients() {
     },
   };
 
-  const req = await fetch('/api/v1/clients', reqOptions);
+  const req = await fetch("/api/v1/emails", reqOptions);
 
   if (req.ok) {
     const res = await req.json();
     console.log('res', res);
-    return res.clients;
+    return res.emails;
   } else {
     const errorRes = await req.json();
     alert(errorRes.message);
@@ -82,52 +82,37 @@ function renderPagination() {
 }
 
 function render() {
-  const clientsTable = document.querySelector('.js-clients-table');
-  const clientsTableBody = clientsTable.querySelector('.js-clients-table-tbody');
-  const totalRecords = document.querySelector('.js-total-records');
+  const emailsTable = document.querySelector('.js-emails-table');
+  const emailsTableBody = emailsTable.querySelector('.js-emails-table-tbody');
 
-  totalRecords.innerHTML = cachedClients.length;
+  emailsTableBody.innerHTML = "";
 
-  clientsTableBody.innerHTML = "";
-
-  clients.forEach((client) => {
+  emails.forEach((email) => {
     const tr = document.createElement('tr');
     tr.classList.add("-cursor-pointer");
-    tr.dataset.href = `/client-details.html?id=${client.id}`;
+    tr.dataset.href = `/email-details.html?id=${email.id}`;
 
-    const tdId = document.createElement('td');
-    tdId.textContent = client.id;
-    tr.appendChild(tdId);
+    const tdFrom = document.createElement('td');
+    tdFrom.textContent = `${email.from_name} <${email.from_email}>`;
+    tr.appendChild(tdFrom);
 
-    const tdEmail = document.createElement('td');
-    tdEmail.textContent = client.email;
-    tr.appendChild(tdEmail);
-
-    const tdFirstName = document.createElement('td');
-    tdFirstName.textContent = client.first_name;
-    tr.appendChild(tdFirstName);
-
-    const tdLastName = document.createElement('td');
-    tdLastName.textContent = client.last_name;
-    tr.appendChild(tdLastName);
-
-    const tdCountry = document.createElement('td');
-    tdCountry.textContent = client.country;
-    tr.appendChild(tdCountry);
+    const tdTo = document.createElement('td');
+    tdTo.textContent = `${email.to_name} <${email.to_email}>`;
+    tr.appendChild(tdTo);
 
     tr.addEventListener("click", tableRowClick);
     
-    clientsTableBody.appendChild(tr);
+    emailsTableBody.appendChild(tr);
   });
 
   renderPagination();
 
-  clientsTable.hidden = false;  
+  emailsTable.hidden = false;  
 }
 
 function filter(term) {
-  filteredClients = cachedClients.filter(client => {
-    if (JSON.stringify(client)
+  filteredEmails = cachedEmails.filter(email => {
+    if (JSON.stringify(email)
       .toLowerCase()
       .trim()
       .includes(term.toLowerCase().trim())
@@ -136,12 +121,13 @@ function filter(term) {
     }
     return false;
   }); 
+
   initPagination();
 }
 
 function initFilters() {
-  cachedClients = clients;
-  filteredClients = cachedClients;
+  cachedEmails = emails;
+  filteredEmails = cachedEmails;
   const filterEl = document.querySelector(".js-filter");
   if (!filterEl) {
     return;
@@ -150,13 +136,13 @@ function initFilters() {
 }
 
 function initPagination() {
-  totalPages = Math.ceil(filteredClients.length / 20);
+  totalPages = Math.ceil(filteredEmails.length / 20);
   loadPage(1);
 }
 
 function loadPage(n) {
   const start = (n - 1) * 20;
-  clients = filteredClients.slice(start, start + 20);
+  emails = filteredEmails.slice(start, start + 20);
   currentPage = n;
   render();
 }
@@ -165,21 +151,21 @@ async function main() {
   const logoutButton = document.querySelector('.js-logout-button');
   logoutButton.addEventListener('click', logout);
   
-  const clientsTableLoading = document.querySelector('.js-clients-table-loading');
+  const emailsTableLoading = document.querySelector('.js-emails-table-loading');
 
-  clientsTableLoading.hidden = false;
+  emailsTableLoading.hidden = false;
 
-  clients = await fetchClients();
-  clients.sort((x, y) => y.id - x.id);
+  emails = await fetchEmails();
+  emails.sort((x, y) => y.id - x.id);
 
-  if (clients === null) return;
+  if (emails === null) return;
   
   initFilters();
   initPagination();
 
   render();
 
-  clientsTableLoading.hidden = true;
+  emailsTableLoading.hidden = true;
 }
 
 checkToken();
