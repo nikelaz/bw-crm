@@ -15,7 +15,7 @@ pub(crate) struct Email {
     pub to_email: String,
     pub subject: String,
     pub body: String,
-    pub timestamp: String,
+    pub date: String,
 }
 
 impl EmailModel {
@@ -39,7 +39,7 @@ impl EmailModel {
                 to_email: row.get("to_email"),
                 subject: row.get("subject"),
                 body: row.get("body"),
-                timestamp: row.get("timestamp"),
+                date: row.get("date"),
             })
             .collect();
 
@@ -63,7 +63,7 @@ impl EmailModel {
                 to_email: row.get("to_email"),
                 subject: row.get("subject"),
                 body: row.get("body"),
-                timestamp: row.get("timestamp"),
+                date: row.get("date"),
             })
             .collect();
 
@@ -79,7 +79,7 @@ impl EmailModel {
                 to_email,
                 subject,
                 body,
-                timestamp
+                date
             )
             VALUES (?, ?, ?, ?, ?, ?, ?);
         "#;
@@ -91,7 +91,7 @@ impl EmailModel {
             .bind(email.to_email.as_str())
             .bind(email.subject.as_str())
             .bind(email.body.as_str())
-            .bind(email.timestamp.as_str())
+            .bind(email.date.as_str())
             .execute(&self.pool)
             .await
             .map_err(|e| format!("Failed to create email: {}", e))?;

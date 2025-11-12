@@ -60,7 +60,7 @@ async fn seed_database(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             to_email TEXT,
             subject TEXT,
             body TEXT,
-            timestamp TEXT
+            date TEXT
         )"
     )
         .execute(pool)

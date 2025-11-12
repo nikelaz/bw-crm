@@ -1,0 +1,14 @@
+@layer components {
+  label {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.9rem;
+  }
+
+  input, textarea {
+    display: block;
+    width: 100%;
+    max-width: 35rem;
+    margin-bottom: 1.5rem;
+  }
+}

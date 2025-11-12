@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Send Email - Budget Warden CRM</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link type="text/css" rel="stylesheet" href="/styles/main.css" />
+    <script src="/scripts/send-email.js"></script>
+  </head>
+  <body class="-mh-vh -df -fd-c">
+    <header class="header">
+      <div class="container -df -ai-c -jc-sb -p-lg">
+        <a href="/clients.html">Clients</a>
+        <a href="/emails.html">Emails</a>
+        <button type="button" class="js-logout-button -mt-auto">Logout</button>
+      </div>
+    </header>
+    <main class="container -p-lg">
+      <div class="js-content">
+        <nav class="breadcrumb">
+          <a href="/emails.html">Emails</a>
+          <span>/</span>
+          <a href="/send-email.html">Send Email</a>
+        </nav>
+        <form class="js-form">
+          <label for="from-name">From (Name):</label>
+          <input required type="text" name="from-name" id="from-name" />
+
+          <label for="from-email">From (Email):</label>
+          <input required type="email" name="from-email" id="from-email" />
+
+          <label for="to-name">To (Name):</label>
+          <input required type="text" name="to-name" id="to-name" />
+
+          <label for="to-name">To (Email):</label>
+          <input required type="email" name="to-email" id="to-email" />
+          
+          <label for="subject">Subject:</label>
+          <input required type="text" name="subject" id="subject" />
+
+          <label for="message">Message:</label>
+          <textarea required id="message" name="message" rows="27"></textarea>
+
+          <button type="submit">Send Email</button>
+
+          <progress class="js-loader" hidden></progress>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>

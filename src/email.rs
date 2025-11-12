@@ -1,18 +1,15 @@
+use crate::email_model::Email;
+
 pub fn send(
-    from_first_name: &str,
-    from_email: &str,
-    to_name: &str,
-    to_email: &str,
-    subject: &str,
-    body: &str
+    email: &Email,
 ) {
     match smtp2go::Email::new()
-        .from(format!("{} <{}>", from_first_name, from_email))
+        .from(format!("{} <{}>", email.from_name, email.from_email))
         .to(&[
-          format!("{} <{}>", to_name, to_email)
+          format!("{} <{}>", email.to_name, email.to_email)
         ])
-        .subject(subject)
-        .text_body(body)
+        .subject(email.subject.as_str())
+        .text_body(email.body.as_str())
         .send() {
           Ok(response) => println!("Message Successfully Sent - {:?}", response),
           Err(error) => println!("Message failed: Error: {:?}", error)

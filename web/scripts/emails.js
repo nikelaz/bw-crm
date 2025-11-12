@@ -72,7 +72,7 @@ function renderPagination() {
     paginationWrapper.appendChild(paginationBtn);
   }
 
-  if (currentPage !== totalPages) {
+  if (totalPages > 0 && currentPage !== totalPages) {
     const nextBtn = document.createElement("button");
     nextBtn.setAttribute("type", "button");
     nextBtn.innerHTML = "Next";
@@ -99,6 +99,10 @@ function render() {
     const tdTo = document.createElement('td');
     tdTo.textContent = `${email.to_name} <${email.to_email}>`;
     tr.appendChild(tdTo);
+
+    const tdDate = document.createElement('td');
+    tdDate.textContent = `${new Date(email.date).toLocaleString()}`;
+    tr.appendChild(tdDate);
 
     tr.addEventListener("click", tableRowClick);
     
@@ -136,7 +140,13 @@ function initFilters() {
 }
 
 function initPagination() {
-  totalPages = Math.ceil(filteredEmails.length / 20);
+  if (filteredEmails.length === 0) {
+    totalPages = 0;
+  }
+  else {
+    totalPages = Math.ceil(filteredEmails.length / 20);
+  }
+
   loadPage(1);
 }
 

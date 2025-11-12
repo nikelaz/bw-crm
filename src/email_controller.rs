@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use jsonwebtoken::{decode, Validation, DecodingKey};
 use crate::email_model::Email;
 use crate::AppState;
+use crate::email;
 
 #[derive(Serialize)]
 pub(crate) struct ResponseEmails {
@@ -29,7 +30,7 @@ pub struct CreateEmailPayload {
     pub to_email: String,
     pub subject: String,
     pub body: String,
-    pub timestamp: String,
+    pub date: String,
 }
 
 pub(crate) async fn get_emails(State(state): State<AppState>, headers: HeaderMap) -> (StatusCode, Json<ResponseEmails>) {
@@ -104,11 +105,14 @@ pub(crate) async fn create_email(
                 to_email: payload.to_email,
                 subject: payload.subject,
                 body: payload.body,
-                timestamp: payload.timestamp,
+                date: payload.date,
             };
 
             match state.email_model.create(&new_email).await {
-                Ok(_) => (StatusCode::OK, vec![], "Email created successfully".to_string()),
+                Ok(_) => {
+                    email::send(&new_email);
+                    (StatusCode::OK, vec![], "Email created successfully".to_string())
+                },
                 Err(err) => (StatusCode::BAD_REQUEST, vec![], format!("Database error: {}", err)),
             }
         }
