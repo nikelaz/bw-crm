@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Email Details - Budget Warden CRM</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link type="text/css" rel="stylesheet" href="/styles/main.css" />
+    <script src="/scripts/email-details.js"></script>
+  </head>
+  <body class="-mh-vh -df -fd-c">
+    <header class="header">
+      <div class="container -df -ai-c -jc-sb -p-lg">
+        <a href="/clients.html">Clients</a>
+        <a href="/emails.html">Emails</a>
+        <button type="button" class="js-logout-button -mt-auto">Logout</button>
+      </div>
+    </header>
+    <main class="container -p-lg">
+      <progress class="js-loader"></progress>
+
+      <div class="js-content" hidden>
+        <nav class="breadcrumb">
+          <a href="/clients.html">Clients</a>
+          <span>/</span>
+          <a href="/client-details.html" class="js-breadcrumb-end">Client Details</a>
+        </nav>
+        <form class="js-form">
+          <dl class="deflist">
+            <dt>ID:</dt>
+            <dd><slot class="js-id"></slot></dd>
+            <dt>Email:</dt>
+            <dd><slot class="js-email"></slot></dd>
+            <dt>First Name:</dt>
+            <dd><slot class="js-first-name"></slot></dd>
+            <dt>Last Name:</dt>
+            <dd><slot class="js-last-name"></slot></dd>
+            <dt>Country:</dt>
+            <dd><slot class="js-country"></slot></dd>
+            <dt>Currency:</dt>
+            <dd><slot class="js-currency"></slot></dd>
+            <dt>Registration Date:</dt>
+            <dd><slot class="js-created"></slot></dd> 
+            <dt>Last Activity Date:</dt>
+            <dd><slot class="js-last-activity-date"></slot></dd>
+            <dt>Do Not Message:</dt>
+            <dd>
+              <input name="do-not-message" type="checkbox" class="js-do-not-message" />
+            </dd>
+            <dt>Notes:</dt>
+            <dd>
+              <textarea
+                name="notes"
+                style="min-height: 500px;"
+                class="js-notes -w-100 -bg-transparent -border-none -outline-none"
+              ></textarea>
+            </dd>
+          </dl>
+          <button type="submit">Save Changes</button>
+        </form>
+      </div>
+    </main>
+  </body>
+</html>
