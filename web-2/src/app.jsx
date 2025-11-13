@@ -13,7 +13,7 @@ import "mantine-datatable/styles.layer.css";
 
 export default function App() {
   return (
-    <MantineProvider>
+    <MantineProvider defaultColorScheme="auto">
       <AppShell
         padding="md"
         navbar={{
