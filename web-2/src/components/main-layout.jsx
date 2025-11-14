@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Drawer, DrawerContent } from "@progress/kendo-react-layout";
+import {
+  AppBar,
+  AppBarSection,
+  Drawer,
+  DrawerContent
+} from "@progress/kendo-react-layout";
 import Container from "./container";
 import {
   envelopeIcon,
@@ -26,6 +31,17 @@ const items = [
   },
 ];
 
+const styles = {
+  drawer: {
+    height: "calc(100vh - 50px)",
+  },
+  appBar: {
+    minHeight: "50px",
+    boxShadow: "none",
+    borderBottom: "1px solid var(--kendo-color-border)",
+  }
+};
+
 export default function MainLayout(props) {
   const [selected, setSelected] = useState("/");
   const [_, navigate] = useLocation();
@@ -42,19 +58,26 @@ export default function MainLayout(props) {
   }));
 
   return (
-    <Drawer
-      expanded={true}
-      position={'start'}
-      mode={'push'}
-      items={itemsWithSelected}
-      style={{ height: '100vh' }}
-      onSelect={handleSelect}
-    >
-      <DrawerContent>
-        <Container>
-          {props.children}
-        </Container>
-      </DrawerContent>
-    </Drawer>
+    <>
+      <AppBar style={styles.appBar}>
+        <AppBarSection>
+          <div>BW CRM</div>
+        </AppBarSection>
+      </AppBar>
+      <Drawer
+        expanded={true}
+        position="start"
+        mode="push"
+        items={itemsWithSelected}
+        style={styles.drawer}
+        onSelect={handleSelect}
+      >
+        <DrawerContent>
+          <Container>
+            {props.children}
+          </Container>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }

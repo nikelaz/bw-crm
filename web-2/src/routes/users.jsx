@@ -1,9 +1,61 @@
-const records = [
-  { id: 1, name: "Joe Biden", email: "joe.biden@outlook.com", country: "USA", created: "31-01-1997" },
-  { id: 2, name: "George Bush", email: "bush@outlook.com", country: "USA", created: "31-01-1997" },
-  { id: 3, name: "Donald Trump", email: "d.j.trump@outlook.com", country: "USA", created: "31-01-0001" },
-];
+import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
+import { StackLayout } from "@progress/kendo-react-layout";
+import PageTitle from "../components/page-title";
+import { useStore } from "../store";
 
 export default function Users() {
-  return <p>Users Route</p>
+  const users = useStore((state) => state.users);
+
+  return (
+    <StackLayout orientation="vertical" gap={20}>
+      <PageTitle>Users</PageTitle>
+      <Grid 
+        data={users}
+        dataItemKey="id"
+        autoProcessData={true}
+        sortable={true}
+        filterable={true}
+        editable={{
+          mode: "incell"
+        }}
+        defaultTake={15}
+        pageable={{
+          buttonCount: 4,
+          pageSizes: [5, 10, 15, 20, 50]
+        }}
+      >
+        <Column
+          field="id"
+          title="ID"
+          editable={false}
+          filterable={false}
+          width="75px"
+        />
+        <Column
+          field="name"
+          title="Name"
+          editable={false}
+          filterable={true}
+        />
+        <Column
+          field="email"
+          title="Email"
+          editable={false}
+          filterable={true}
+        />
+        <Column
+          field="country"
+          title="Country"
+          editable={false}
+          filterable={true}
+        />
+        <Column
+          field="created"
+          title="Registration Date"
+          editable={false}
+          filterable={true}
+        />
+      </Grid>
+    </StackLayout>
+  );
 }
