@@ -1,22 +1,34 @@
 import MainLayout from "../components/main-layout";
 import { Grid, GridColumn as Column, GridToolbar, GridSearchBox } from "@progress/kendo-react-grid";
 import { Window, WindowActionsBar, Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
+import { StackLayout } from "@progress/kendo-react-layout";
 import PageTitle from "../components/page-title";
 import { ListLayout, ListLayoutHeader, ListLayoutBody } from "../components/list-layout";
 import { FormLayout, FormField } from "../components/forms";
-import { TextBox, Checkbox, TextArea } from "@progress/kendo-react-inputs";
-import { DatePicker } from '@progress/kendo-react-dateinputs';
-import { DropDownList } from '@progress/kendo-react-dropdowns';
+import { TextBox } from "@progress/kendo-react-inputs";
+import { ListBox, ListBoxToolbar, processListBoxData, processListBoxDragAndDrop } from "@progress/kendo-react-listbox";
 import { Button } from "@progress/kendo-react-buttons";
 import { useStore } from "../store";
 import { useState, useRef } from "react";
 import { saveIcon, clockArrowRotateIcon, trashIcon, plusIcon } from "@progress/kendo-svg-icons";
-import countries from "../data/countries";
 
-export default function Contacts() {
+const SELECTED_FIELD = "selected";
+
+export default function Lists() {
   const contacts = useStore((state) => state.contacts);
-  const getContact = useStore((state) => state.getContact);
-  const [currentContact, setCurrentContact] = useState(null);
+  const formattedContacts = contacts.map(contact => ({
+    ...contact,
+    formattedName: `${contact.first_name} ${contact.last_name} <${contact.email}>`,
+    selected: false,
+  }));
+  const [listState, setListState] = useState({
+    allContacts: formattedContacts,
+    selectedContacts: [],
+    draggedItem: {}
+  });
+  const lists = useStore((state) => state.lists);
+  const getList = useStore((state) => state.getList);
+  const [currentList, setCurrentList] = useState(null);
   const [isDetailsWindowVisible, setIsDetailsWindowVisible] = useState(false);
   const [isErrorDialogVisible, setIsErrorDialogVisible] = useState(false);
   const [error, setError] = useState("");
@@ -59,7 +71,7 @@ export default function Contacts() {
 
   const deleteItemConfirm = () => {
     setDeleteItemLabel(
-      `${currentContact.first_name} ${currentContact.last_name} (ID: ${currentContact.id})`
+      `${currentList.title} (ID: ${currentList.id})`
     );
     toggleDeleteDialog();
   };
@@ -71,33 +83,84 @@ export default function Contacts() {
   };
 
   const handleRowClick = (event) => {
-    setCurrentContact(getContact(event.dataItem.id));
+    setCurrentList(getList(event.dataItem.id));
     setIsDetailsWindowVisible(true);
   };
 
-  const createContact = async (event) => {
+  const createList = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
-    console.log("create contact", data);
+    data.selectedContacts = listState.selectedContacts;
+    console.log("create list", data);
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     setIsLoading(false);
     toggleCreateWindow();
   }
 
+  const handleListItemClick = (event, data, connectedData) => {
+        setListState({
+            ...listState,
+            [data]: listState[data].map((item) => {
+                if (item.id === event.dataItem.id) {
+                    item[SELECTED_FIELD] = !item[SELECTED_FIELD];
+                } else if (!event.nativeEvent.ctrlKey) {
+                    item[SELECTED_FIELD] = false;
+                }
+                return item;
+            }),
+            [connectedData]: listState[connectedData].map((item) => {
+                item[SELECTED_FIELD] = false;
+                return item;
+            })
+        });
+    };
+
+  const handleToolBarClick = (event) => {
+    const toolName = event.toolName || '';
+    const result = processListBoxData(listState.allContacts, listState.selectedContacts, toolName, SELECTED_FIELD);
+    setListState({
+      ...listState,
+      allContacts: result.listBoxOneData,
+      selectedContacts: result.listBoxTwoData
+    });
+  };
+
+  const handleDragStart = (event) => {
+    setListState({
+      ...listState,
+      draggedItem: event.dataItem
+    });
+  };
+
+  const handleDrop = (event) => {
+    let result = processListBoxDragAndDrop(
+      listState.allContacts,
+      listState.selectedContacts,
+      listState.draggedItem,
+      event.dataItem,
+      "id"
+    );
+    setListState({
+      ...listState,
+      allContacts: result.listBoxOneData,
+      selectedContacts: result.listBoxTwoData
+    });
+  };
+
   return (
     <>
       <MainLayout>
         <ListLayout>
           <ListLayoutHeader>
-            <PageTitle>Contacts</PageTitle>
+            <PageTitle>Lists</PageTitle>
           </ListLayoutHeader>
           <ListLayoutBody>
             <Grid 
-              data={contacts}
+              data={lists}
               dataItemKey="id"
               autoProcessData={true}
               resizable={true}
@@ -118,7 +181,7 @@ export default function Contacts() {
                   svgIcon={plusIcon}
                   onClick={toggleCreateWindow}
                 >
-                  New Contact
+                  New List
                 </Button>
               </GridToolbar>
               <Column
@@ -128,29 +191,9 @@ export default function Contacts() {
                 width="120px"
               />
               <Column
-                field="first_name"
-                title="First Name"
+                field="title"
+                title="Title"
                 filterable={true}
-              />
-              <Column
-                field="last_name"
-                title="Last Name"
-                filterable={true}
-              />
-              <Column
-                field="email"
-                title="Email"
-                filterable={true}
-              />
-              <Column
-                field="country"
-                title="Country"
-                filterable={true}
-              />
-              <Column
-                field="created"
-                title="Registration Date"
-                filterable={false}
               />
             </Grid>
           </ListLayoutBody>
@@ -161,63 +204,63 @@ export default function Contacts() {
         <Window
           modal={true}
           minimizeButton={() => <></>}
-          title="New Contact"
+          title="New List"
           onClose={toggleCreateWindow}
-          initialWidth={680}
-          initialHeight={790}
+          initialWidth={960}
+          initialHeight={700}
         >
-          <form ref={createForm} onSubmit={createContact}>
+          <form ref={createForm} onSubmit={createList}>
             <FormLayout>
-              <FormField label="First Name" editorId="first_name"> 
+              <FormField label="Title" editorId="title"> 
                 <TextBox
                   required
-                  name="first_name"
-                  id="first_name"
+                  name="title"
+                  id="title"
                 />
               </FormField>
 
-              <FormField label="Last Name" editorId="last_name"> 
-                <TextBox
-                  required
-                  name="last_name"
-                  id="last_name"
-                />
-              </FormField>
+              <StackLayout orientation="horizontal" gap="0.5rem">
+                <FormField label="All Customers" editorId="all-customers"> 
+                  <ListBox
+                    id="all-customers"
+                    style={{ height: 400, width: '100%' }}
+                    data={listState.allContacts}
+                    textField="formattedName"
+                    selectedField={SELECTED_FIELD}
+                    onItemClick={(event) => handleListItemClick(event, "allContacts", "selectedContacts")}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                    toolbar={() => {
+                      return (
+                        <ListBoxToolbar
+                          tools={[
+                            'transferTo',
+                            'transferFrom',
+                            'transferAllTo',
+                            'transferAllFrom',
+                          ]}
+                          data={listState.allContacts}
+                          dataConnected={listState.selectedContacts}
+                          onToolClick={handleToolBarClick}
+                        />
+                      );
+                    }}
+                  />
+                </FormField>
 
-              <FormField label="Email" editorId="email"> 
-                <TextBox
-                  required
-                  name="email"
-                  id="email"
-                  type="email"
-                />
-              </FormField>
-
-              <FormField label="Country" editorId="country"> 
-                <DropDownList
-                  name="country"
-                  id="country"
-                  data={countries}
-                />
-              </FormField>
-
-              <FormField label="Do Not Message" editorId="do_not_message"> 
-                <Checkbox
-                  size="large"
-                  name="do_not_message"
-                  id="do_not_message"
-                />
-              </FormField>
-
-              <FormField label="Notes" editorId="notes"> 
-                <TextArea
-                  name="notes"
-                  id="notes"
-                  autoSize={true}
-                  resizable="vertical"
-                  rows={5}
-                />
-              </FormField>
+                <FormField label="Included in the List" editorId="included-customers"> 
+                  <ListBox
+                    id="included-customers"
+                    style={{ height: 400, width: '100%' }}
+                    data={listState.selectedContacts}
+                    textField="formattedName"
+                    selectedField={SELECTED_FIELD}
+                    onItemClick={(event) => handleListItemClick(event, "selectedContacts", "allContacts")}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                  />
+                </FormField>
+              </StackLayout>
             </FormLayout>
           </form>
           <WindowActionsBar layout="start">
@@ -228,7 +271,7 @@ export default function Contacts() {
               type="button"
               onClick={() => { createForm.current.requestSubmit(); }}
             >
-              { isLoading ? "Creating Contact" : "Create Contact" }
+              { isLoading ? "Creating List" : "Create List" }
             </Button>
           </WindowActionsBar>
         </Window>
@@ -238,7 +281,7 @@ export default function Contacts() {
         <Window
           modal={true}
           minimizeButton={() => <></>}
-          title="Contact Details"
+          title="List Details"
           onClose={toggleDetailsWindow}
           initialWidth={680}
           initialHeight={890}
@@ -251,78 +294,16 @@ export default function Contacts() {
                   readOnly
                   name="id"
                   id="id"
-                  value={currentContact.id}
+                  value={currentList.id}
                 />
               </FormField>
 
-              <FormField label="First Name" editorId="first_name"> 
+              <FormField label="Title" editorId="title"> 
                 <TextBox
                   required
-                  name="first_name"
-                  id="first_name"
-                  defaultValue={currentContact.first_name}
-                />
-              </FormField>
-
-              <FormField label="Last Name" editorId="last_name"> 
-                <TextBox
-                  required
-                  name="last_name"
-                  id="last_name"
-                  defaultValue={currentContact.last_name}
-                />
-              </FormField>
-
-              <FormField label="Email" editorId="email"> 
-                <TextBox
-                  required
-                  name="email"
-                  id="email"
-                  defaultValue={currentContact.email}
-                />
-              </FormField>
-
-              <FormField label="Country" editorId="country"> 
-                <DropDownList
-                  name="country"
-                  id="country"
-                  data={countries}
-                  defaultValue={currentContact.country}
-                />
-              </FormField>
-
-              <FormField label="Registration Date" editorId="created"> 
-                <DatePicker
-                  name="created"
-                  id="created"
-                  defaultValue={new Date(currentContact.created)}
-                />
-              </FormField>
-
-              <FormField label="Last Activity Date" editorId="last_activity_date"> 
-                <DatePicker
-                  name="last_activity_date"
-                  id="last_activity_date"
-                  defaultValue={currentContact.last_activity_date}
-                />
-              </FormField>
-
-              <FormField label="Do Not Message" editorId="created"> 
-                <Checkbox
-                  defaultChecked={currentContact.do_not_message}
-                  size="large"
-                  name="do_not_message"
-                  id="do_not_message"
-                />
-              </FormField>
-
-              <FormField label="Notes" editorId="notes"> 
-                <TextArea
-                  name="notes"
-                  id="notes"
-                  autoSize={true}
-                  resizable="vertical"
-                  rows={5}
+                  name="title"
+                  id="title"
+                  defaultValue={currentList.title}
                 />
               </FormField>
             </FormLayout>
@@ -343,7 +324,7 @@ export default function Contacts() {
               themeColor="error"
               onClick={deleteItemConfirm}
             >
-              Delete Contact
+              Delete List
             </Button>
           </WindowActionsBar>
         </Window>

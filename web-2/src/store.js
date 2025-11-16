@@ -2,12 +2,14 @@ import { create } from "zustand";
 import sampleContacts from "./data/contacts";
 import sampleEmails from "./data/emails";
 import sampleEmailTemplates from "./data/email-templates";
+import sampleLists from "./data/lists";
 
 export const useStore = create((set, get) => ({
   token: localStorage.getItem("token") || null,
   contacts: sampleContacts,
   emails: sampleEmails,
   emailTemplates: sampleEmailTemplates,
+  lists: sampleLists,
 
   login: (username, password) => {
     const token = "123qwe";
@@ -48,4 +50,6 @@ export const useStore = create((set, get) => ({
   getEmail: (id) => get().emails.find((email) => email.id === id),
   
   getEmailTemplate: (id) => get().emailTemplates.find((emailTemplate) => emailTemplate.id === id),
+
+  getList: (id) => get().lists.find((list) => list.id === id),
 }));

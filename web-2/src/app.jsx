@@ -4,6 +4,7 @@ import { Switch, Route } from "wouter";
 import Login from "./routes/login";
 import Dashboard from "./routes/dashboard";
 import Contacts from "./routes/contacts";
+import Lists from "./routes/lists";
 import Emails from "./routes/emails";
 import EmailTemplates from "./routes/email-templates";
 import EmailSend from "./routes/email-send";
@@ -20,6 +21,7 @@ export default function App() {
       <Route path="/" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/contacts" component={Contacts} />
+      <Route path="/lists" component={Lists} />
       <Route path="/emails" component={Emails} />
       <Route path="/emails/templates" component={EmailTemplates} />
       <Route path="/emails/send" component={EmailSend} />

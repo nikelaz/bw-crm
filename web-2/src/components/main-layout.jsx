@@ -15,6 +15,7 @@ import {
   dashboardSolidIcon,
   userIcon,
   logoutIcon,
+  listUnorderedOutlineIcon,
 } from "@progress/kendo-svg-icons";
 
 const items = [
@@ -27,6 +28,11 @@ const items = [
     text: "Contacts",
     svgIcon: userIcon,
     route: "/contacts",
+  },
+  {
+    text: "Lists",
+    svgIcon: listUnorderedOutlineIcon,
+    route: "/lists",
   },
   {
     text: "Emails",

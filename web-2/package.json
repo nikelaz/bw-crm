@@ -15,6 +15,7 @@
     "@progress/kendo-react-grid": "^13.0.0",
     "@progress/kendo-react-inputs": "^13.0.0",
     "@progress/kendo-react-layout": "^13.0.0",
+    "@progress/kendo-react-listbox": "^13.0.0",
     "@progress/kendo-theme-bootstrap": "^12.2.3",
     "@progress/kendo-theme-default": "^12.2.3",
     "@tabler/icons-react": "^3.35.0",
