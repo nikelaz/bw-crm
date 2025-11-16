@@ -8,6 +8,7 @@ import Lists from "./routes/lists";
 import Emails from "./routes/emails";
 import EmailTemplates from "./routes/email-templates";
 import EmailSend from "./routes/email-send";
+import Pipeline from "./routes/pipeline";
 import NotFound from "./routes/not-found";
 
 // Styles
@@ -25,6 +26,7 @@ export default function App() {
       <Route path="/emails" component={Emails} />
       <Route path="/emails/templates" component={EmailTemplates} />
       <Route path="/emails/send" component={EmailSend} />
+      <Route path="/pipeline" component={Pipeline} />
       <Route component={NotFound} />
     </Switch>
   );

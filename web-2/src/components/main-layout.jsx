@@ -39,6 +39,10 @@ const items = [
     svgIcon: envelopeIcon,
     route: "/emails",
   },
+  {
+    text: "Pipeline",
+    route: "/pipeline",
+  },
 ];
 
 const styles = {
