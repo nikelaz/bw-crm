@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import sampleContacts from "./data/contacts";
 import sampleEmails from "./data/emails";
+import sampleEmailTemplates from "./data/email-templates";
 
 export const useStore = create((set, get) => ({
   token: localStorage.getItem("token") || null,
   contacts: sampleContacts,
   emails: sampleEmails,
+  emailTemplates: sampleEmailTemplates,
 
   login: (username, password) => {
     const token = "123qwe";
@@ -19,7 +21,7 @@ export const useStore = create((set, get) => ({
   },
 
   getContact: (id) => get().contacts.find((contact) => contact.id === id),
-
+  
   getNewestContacts: (limit = 10) => {
     const contacts = get().contacts;
     if (contacts.length <= limit) return contacts;
@@ -42,4 +44,8 @@ export const useStore = create((set, get) => ({
       .sort((a, b) => b.count - a.count)
       .slice(0, limit);
   },
+
+  getEmail: (id) => get().emails.find((email) => email.id === id),
+  
+  getEmailTemplate: (id) => get().emailTemplates.find((emailTemplate) => emailTemplate.id === id),
 }));

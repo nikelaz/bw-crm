@@ -63,7 +63,7 @@ export default function MainLayout(props) {
 
   const itemsWithSelected = items.map(item => ({
     ...item,
-    selected: item.route === location,
+    selected: location.startsWith(item.route),
   }));
 
   return (

@@ -1,17 +1,16 @@
 import MainLayout from "../components/main-layout";
 import { Grid, GridColumn as Column, GridToolbar, GridSearchBox } from "@progress/kendo-react-grid";
-import { Window, Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
-import { StackLayout } from "@progress/kendo-react-layout";
+import { Window, WindowActionsBar, Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import PageTitle from "../components/page-title";
 import { ListLayout, ListLayoutHeader, ListLayoutBody } from "../components/list-layout";
 import { FormLayout, FormField } from "../components/forms";
-import { TextBox, Switch, TextArea } from "@progress/kendo-react-inputs";
+import { TextBox, Checkbox, TextArea } from "@progress/kendo-react-inputs";
 import { DatePicker } from '@progress/kendo-react-dateinputs';
 import { DropDownList } from '@progress/kendo-react-dropdowns';
 import { Button } from "@progress/kendo-react-buttons";
 import { useStore } from "../store";
-import { useState } from "react";
-import { saveIcon, clockArrowRotateIcon, trashIcon } from "@progress/kendo-svg-icons";
+import { useState, useRef } from "react";
+import { saveIcon, clockArrowRotateIcon, trashIcon, plusIcon } from "@progress/kendo-svg-icons";
 import countries from "../data/countries";
 
 export default function Contacts() {
@@ -24,6 +23,9 @@ export default function Contacts() {
   const [isDeleteDialogVisible, setIsDeleteDialogVisible] = useState(false);
   const [deleteItemLabel, setDeleteItemLabel] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreateWindowVisible, setIsCreateWindowVisible] = useState(false);
+  const detailsForm = useRef(null);
+  const createForm = useRef(null);
 
   const saveChanges = async (event) => {
     event.preventDefault();
@@ -51,6 +53,10 @@ export default function Contacts() {
     setIsDeleteDialogVisible(!isDeleteDialogVisible);
   };
 
+  const toggleCreateWindow = () => {
+    setIsCreateWindowVisible(!isCreateWindowVisible);
+  };
+
   const deleteItemConfirm = () => {
     setDeleteItemLabel(
       `${currentContact.first_name} ${currentContact.last_name} (ID: ${currentContact.id})`
@@ -68,6 +74,18 @@ export default function Contacts() {
     setCurrentContact(getContact(event.dataItem.id));
     setIsDetailsWindowVisible(true);
   };
+
+  const createContact = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
+    
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    console.log("create contact", data);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    toggleCreateWindow();
+  }
 
   return (
     <>
@@ -95,6 +113,12 @@ export default function Contacts() {
             >
               <GridToolbar>
                 <GridSearchBox style={{ width: "320px" }} />
+                <Button
+                  svgIcon={plusIcon}
+                  onClick={toggleCreateWindow}
+                >
+                  New Contact
+                </Button>
               </GridToolbar>
               <Column
                 field="id"
@@ -127,14 +151,88 @@ export default function Contacts() {
                 title="Registration Date"
                 filterable={false}
               />
-              <Column
-                title="Actions"
-                filterable={false}
-              />
             </Grid>
           </ListLayoutBody>
         </ListLayout>
       </MainLayout>
+
+      { isCreateWindowVisible ? (
+        <Window
+          modal={true}
+          minimizeButton={() => <></>}
+          title="New Contact"
+          onClose={toggleCreateWindow}
+          initialWidth={680}
+          initialHeight={790}
+        >
+          <form ref={createForm} onSubmit={createContact}>
+            <FormLayout>
+              <FormField label="First Name" editorId="first_name"> 
+                <TextBox
+                  required
+                  name="first_name"
+                  id="first_name"
+                />
+              </FormField>
+
+              <FormField label="Last Name" editorId="last_name"> 
+                <TextBox
+                  required
+                  name="last_name"
+                  id="last_name"
+                />
+              </FormField>
+
+              <FormField label="Email" editorId="email"> 
+                <TextBox
+                  required
+                  name="email"
+                  id="email"
+                  type="email"
+                />
+              </FormField>
+
+              <FormField label="Country" editorId="country"> 
+                <DropDownList
+                  name="country"
+                  id="country"
+                  data={countries}
+                />
+              </FormField>
+
+              <FormField label="Do Not Message" editorId="do_not_message"> 
+                <Checkbox
+                  size="large"
+                  name="do_not_message"
+                  id="do_not_message"
+                />
+              </FormField>
+
+              <FormField label="Notes" editorId="notes"> 
+                <TextArea
+                  name="notes"
+                  id="notes"
+                  autoSize={true}
+                  resizable="vertical"
+                  rows={5}
+                />
+              </FormField>
+            </FormLayout>
+          </form>
+          <WindowActionsBar layout="start">
+            <Button
+              svgIcon={isLoading ? clockArrowRotateIcon : saveIcon}
+              disabled={isLoading}
+              themeColor="primary"
+              type="button"
+              onClick={() => { createForm.current.requestSubmit(); }}
+            >
+              { isLoading ? "Creating Contact" : "Create Contact" }
+            </Button>
+          </WindowActionsBar>
+        </Window>
+      ) : null }
+
       { isDetailsWindowVisible ? (
         <Window
           modal={true}
@@ -144,7 +242,7 @@ export default function Contacts() {
           initialWidth={680}
           initialHeight={890}
         >
-          <form onSubmit={saveChanges}>
+          <form ref={detailsForm} onSubmit={saveChanges}>
             <FormLayout>
               <FormField label="ID" editorId="id"> 
                 <TextBox
@@ -209,11 +307,11 @@ export default function Contacts() {
               </FormField>
 
               <FormField label="Do Not Message" editorId="created"> 
-                <Switch
-                  defaultChecked={false}
+                <Checkbox
+                  defaultChecked={currentContact.do_not_message}
                   size="large"
-                  name="do-not-message"
-                  id="do-not-message"
+                  name="do_not_message"
+                  id="do_not_message"
                 />
               </FormField>
 
@@ -226,27 +324,27 @@ export default function Contacts() {
                   rows={5}
                 />
               </FormField>
-             
-              <StackLayout style={{ width: "fit-content" }} orientation="horizontal" gap={20}>
-                <Button
-                  svgIcon={isLoading ? clockArrowRotateIcon : saveIcon}
-                  disabled={isLoading}
-                  themeColor="primary"
-                  type="submit"
-                >
-                  { isLoading ? "Saving Changes" : "Save Changes" }
-                </Button>
-                <Button
-                  svgIcon={trashIcon}
-                  type="button"
-                  themeColor="error"
-                  onClick={deleteItemConfirm}
-                >
-                  Delete Contact
-                </Button>
-              </StackLayout>
             </FormLayout>
           </form>
+          <WindowActionsBar layout="start">
+            <Button
+              svgIcon={isLoading ? clockArrowRotateIcon : saveIcon}
+              disabled={isLoading}
+              themeColor="primary"
+              type="button"
+              onClick={() => { detailsForm.current.requestSubmit(); }}
+            >
+              { isLoading ? "Saving Changes" : "Save Changes" }
+            </Button>
+            <Button
+              svgIcon={trashIcon}
+              type="button"
+              themeColor="error"
+              onClick={deleteItemConfirm}
+            >
+              Delete Contact
+            </Button>
+          </WindowActionsBar>
         </Window>
       ) : null }
 

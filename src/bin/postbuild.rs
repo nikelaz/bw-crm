@@ -26,6 +26,6 @@ fn main() {
     println!("running postbuild script");
 
     println!("copying web directory");
-    copy_dir_recursive(Path::new("web"), Path::new("target/release/web"))
+    copy_dir_recursive(Path::new("web-2/dist"), Path::new("target/release/web"))
         .expect("Failed to copy web directory");
 }

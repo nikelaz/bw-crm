@@ -15,6 +15,7 @@ const styles = {
     display: "flex",
     minHeight: `${HEADER_HEIGHT_REM}rem`,
     alignItems: "center",
+    justifyContent: "space-between",
   },
   body: {
     height: `calc(100vh - ${BODY_HEIGHT_REM}rem)`,
