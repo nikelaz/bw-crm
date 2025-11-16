@@ -1,3 +1,10 @@
+import MainLayout from "../components/main-layout";
+import PageTitle from "../components/page-title";
+
 export default function NotFound() {
-  return <p>404 Page Not Found</p>
+  return (
+    <MainLayout>
+      <PageTitle>Page Not Found</PageTitle>
+    </MainLayout>
+  );
 }

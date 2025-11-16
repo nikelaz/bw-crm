@@ -1,8 +1,7 @@
 const styles = {
   container: {
-    maxWidth: "1280px",
-    margin: "0 auto",
     padding: "1.75rem",
+    height: "100%",
   },
 };
 

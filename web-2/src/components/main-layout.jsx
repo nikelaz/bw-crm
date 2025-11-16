@@ -1,83 +1,105 @@
-import { useState } from "react";
 import { useLocation } from "wouter";
+import { useStore } from "../store";
 import {
   AppBar,
   AppBarSection,
+  AppBarSpacer,
   Drawer,
   DrawerContent
 } from "@progress/kendo-react-layout";
+import { Button } from "@progress/kendo-react-buttons";
 import Container from "./container";
+import AuthGate from "./auth-gate";
 import {
   envelopeIcon,
   dashboardSolidIcon,
-  userIcon
+  userIcon,
+  logoutIcon,
 } from "@progress/kendo-svg-icons";
 
 const items = [
   {
     text: "Dashboard",
     svgIcon: dashboardSolidIcon,
-    route: "/",
+    route: "/dashboard",
   },
   {
-    text: "Users",
+    text: "Contacts",
     svgIcon: userIcon,
-    route: "/users",
+    route: "/contacts",
   },
   {
-    text: "Email",
+    text: "Emails",
     svgIcon: envelopeIcon,
-    route: "/email",
+    route: "/emails",
   },
 ];
 
 const styles = {
+  root: {
+    height: "100vh",
+  },
   drawer: {
-    height: "calc(100vh - 50px)",
+    height: "calc(100% - 4rem)",
   },
   appBar: {
-    minHeight: "50px",
+    minHeight: "4rem",
     boxShadow: "none",
     borderBottom: "1px solid var(--kendo-color-border)",
+  },
+  main: {
+    height: "100%",
+    overflow: "auto",
   }
 };
 
 export default function MainLayout(props) {
-  const [selected, setSelected] = useState("/");
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const logout = useStore(store => store.logout);
 
   const handleSelect = (e) => {
-    const route = e.itemTarget.props.route;
-    navigate(route);
-    setSelected(route);
+    navigate(e.itemTarget.props.route);
   };
 
   const itemsWithSelected = items.map(item => ({
     ...item,
-    selected: item.route === selected,
+    selected: item.route === location,
   }));
 
   return (
-    <>
-      <AppBar style={styles.appBar}>
-        <AppBarSection>
-          <div>BW CRM</div>
-        </AppBarSection>
-      </AppBar>
-      <Drawer
-        expanded={true}
-        position="start"
-        mode="push"
-        items={itemsWithSelected}
-        style={styles.drawer}
-        onSelect={handleSelect}
-      >
-        <DrawerContent>
-          <Container>
-            {props.children}
-          </Container>
-        </DrawerContent>
-      </Drawer>
-    </>
+    <AuthGate>
+      <div style={styles.root}>
+        <AppBar style={styles.appBar}>
+          <AppBarSection>
+            <div>BW CRM</div>
+          </AppBarSection>
+          <AppBarSpacer />
+          <AppBarSection>
+            <Button
+              fillMode="flat"
+              type="button"
+              svgIcon={logoutIcon}
+              onClick={logout}
+            >
+              Logout
+            </Button>
+          </AppBarSection>
+        </AppBar>
+        <Drawer
+          expanded={true}
+          position="start"
+          mode="push"
+          items={itemsWithSelected}
+          style={styles.drawer}
+          onSelect={handleSelect}
+        >
+          <DrawerContent style={styles.main}>
+            <Container>
+              {props.children}
+            </Container>
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </AuthGate>
   );
 }

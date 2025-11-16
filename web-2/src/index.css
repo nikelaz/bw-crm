@@ -1,3 +1,11 @@
 html, body {
   font-family: var(--kendo-font-family, inherit);
 }
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+.row-cursor-pointer .k-table-row {
+  cursor: pointer;
+}

@@ -3,6 +3,7 @@ import { Typography } from "@progress/kendo-react-common";
 const styles = {
   title: {
     fontSize: "1.75rem",
+    marginBottom: 0,
   }
 };
 
