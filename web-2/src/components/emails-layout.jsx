@@ -30,11 +30,18 @@ export default function EmailsLayout(props) {
                 Email Templates
               </Button>
               <Button
+                onClick={() => navigate("/emails/send-template")}
+                togglable={true}
+                selected={route === "/emails/send-template"}
+              >
+                Send Email from Template
+              </Button>
+              <Button
                 onClick={() => navigate("/emails/send")}
                 togglable={true}
                 selected={route === "/emails/send"}
               >
-                Send Emails to Contacts
+                Send Unique Email
               </Button>
             </ButtonGroup>
           </StackLayout>

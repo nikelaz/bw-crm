@@ -94,12 +94,12 @@ export default function Pipeline() {
     <MainLayout>
       <ListLayout>
         <ListLayoutHeader>
-          <PageTitle>Sales Pipeline</PageTitle>
+          <PageTitle>Pipeline</PageTitle>
         </ListLayoutHeader>
         
         <StackLayout orientation="horizontal" gap="0.5rem"> 
           <div>
-            <p>Lead</p>
+            <p>New Lead</p>
             <ListBox style={{
               height: 350,
               width: '100%'
@@ -125,6 +125,43 @@ export default function Pipeline() {
               // @ts-ignore: for specific use
               name='shipped' />
           </div>
+          <div>
+            <p>Proposal/Demo</p>
+            <ListBox style={{
+              height: 350,
+              width: '100%'
+            }} data={state.shipped} textField="name" selectedField={SELECTED_FIELD} onItemClick={e => handleItemClick(e, 'shipped', 'inDevelopment', 'toDo')} onDragStart={handleDragStart} onDrop={handleDrop}
+              // @ts-ignore: for specific use
+              name='shipped' />
+          </div>
+          <div>
+            <p>Negotiation</p>
+            <ListBox style={{
+              height: 350,
+              width: '100%'
+            }} data={state.shipped} textField="name" selectedField={SELECTED_FIELD} onItemClick={e => handleItemClick(e, 'shipped', 'inDevelopment', 'toDo')} onDragStart={handleDragStart} onDrop={handleDrop}
+              // @ts-ignore: for specific use
+              name='shipped' />
+          </div>
+          <div>
+            <p>Closed Won</p>
+            <ListBox style={{
+              height: 350,
+              width: '100%'
+            }} data={state.shipped} textField="name" selectedField={SELECTED_FIELD} onItemClick={e => handleItemClick(e, 'shipped', 'inDevelopment', 'toDo')} onDragStart={handleDragStart} onDrop={handleDrop}
+              // @ts-ignore: for specific use
+              name='shipped' />
+          </div>
+          <div>
+            <p>Closed Lost</p>
+            <ListBox style={{
+              height: 350,
+              width: '100%'
+            }} data={state.shipped} textField="name" selectedField={SELECTED_FIELD} onItemClick={e => handleItemClick(e, 'shipped', 'inDevelopment', 'toDo')} onDragStart={handleDragStart} onDrop={handleDrop}
+              // @ts-ignore: for specific use
+              name='shipped' />
+          </div>
+
         </StackLayout>
       </ListLayout>
     </MainLayout>

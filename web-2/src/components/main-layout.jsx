@@ -15,6 +15,7 @@ import {
   dashboardSolidIcon,
   userIcon,
   logoutIcon,
+  columnsIcon,
   listUnorderedOutlineIcon,
 } from "@progress/kendo-svg-icons";
 
@@ -41,6 +42,7 @@ const items = [
   },
   {
     text: "Pipeline",
+    svgIcon: columnsIcon,
     route: "/pipeline",
   },
 ];

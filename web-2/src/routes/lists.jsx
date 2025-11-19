@@ -66,6 +66,11 @@ export default function Lists() {
   };
 
   const toggleCreateWindow = () => {
+    setListState({
+      allContacts: formattedContacts,
+      selectedContacts: [],
+      draggedItem: {},
+    });
     setIsCreateWindowVisible(!isCreateWindowVisible);
   };
 
@@ -83,7 +88,30 @@ export default function Lists() {
   };
 
   const handleRowClick = (event) => {
-    setCurrentList(getList(event.dataItem.id));
+    const newList = getList(event.dataItem.id);
+    setCurrentList(newList);
+
+    const listBoxTwoData = newList.contacts.map(contact => ({
+      ...contact,
+      formattedName: `${contact.first_name} ${contact.last_name} <${contact.email}>`,
+      selected: false,
+    }));
+    const listBoxOneData = contacts.flatMap(contact => {
+      let foundContact = listBoxTwoData.find(x => x.id === contact.id);
+      if (foundContact) {
+        return [];
+      }
+      return [{
+        ...contact,
+        formattedName: `${contact.first_name} ${contact.last_name} <${contact.email}>`,
+        selected: false,
+      }];
+    });
+
+    setListState({
+      allContacts: listBoxOneData,
+      selectedContacts: listBoxTwoData
+    });
     setIsDetailsWindowVisible(true);
   };
 
@@ -283,8 +311,8 @@ export default function Lists() {
           minimizeButton={() => <></>}
           title="List Details"
           onClose={toggleDetailsWindow}
-          initialWidth={680}
-          initialHeight={890}
+          initialWidth={960}
+          initialHeight={790}
         >
           <form ref={detailsForm} onSubmit={saveChanges}>
             <FormLayout>
@@ -306,6 +334,49 @@ export default function Lists() {
                   defaultValue={currentList.title}
                 />
               </FormField>
+
+              <StackLayout orientation="horizontal" gap="0.5rem">
+                <FormField label="All Customers" editorId="all-customers"> 
+                  <ListBox
+                    id="all-customers"
+                    style={{ height: 400, width: '100%' }}
+                    data={listState.allContacts}
+                    textField="formattedName"
+                    selectedField={SELECTED_FIELD}
+                    onItemClick={(event) => handleListItemClick(event, "allContacts", "selectedContacts")}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                    toolbar={() => {
+                      return (
+                        <ListBoxToolbar
+                          tools={[
+                            'transferTo',
+                            'transferFrom',
+                            'transferAllTo',
+                            'transferAllFrom',
+                          ]}
+                          data={listState.allContacts}
+                          dataConnected={listState.selectedContacts}
+                          onToolClick={handleToolBarClick}
+                        />
+                      );
+                    }}
+                  />
+                </FormField>
+
+                <FormField label="Included in the List" editorId="included-customers"> 
+                  <ListBox
+                    id="included-customers"
+                    style={{ height: 400, width: '100%' }}
+                    data={listState.selectedContacts}
+                    textField="formattedName"
+                    selectedField={SELECTED_FIELD}
+                    onItemClick={(event) => handleListItemClick(event, "selectedContacts", "allContacts")}
+                    onDragStart={handleDragStart}
+                    onDrop={handleDrop}
+                  />
+                </FormField>
+              </StackLayout>
             </FormLayout>
           </form>
           <WindowActionsBar layout="start">
