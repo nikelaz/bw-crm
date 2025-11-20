@@ -12,6 +12,10 @@ import { useStore } from "../store";
 import { useState, useRef } from "react";
 import { saveIcon, clockArrowRotateIcon, trashIcon, plusIcon } from "@progress/kendo-svg-icons";
 import countries from "../data/countries";
+import contactStages from "../data/contact-stages";
+import Stage from "../models/stage";
+
+const stages = Object.keys(contactStages).map(key => Stage.fromValue(contactStages[key])); 
 
 export default function Contacts() {
   const contacts = useStore((state) => state.contacts);
@@ -201,6 +205,16 @@ export default function Contacts() {
                 />
               </FormField>
 
+              <FormField label="Stage" editorId="stage"> 
+                <DropDownList
+                  name="stage"
+                  id="stage"
+                  textField="label"
+                  dataItemKey="value"
+                  data={stages}
+                />
+              </FormField>
+
               <FormField label="Do Not Message" editorId="do_not_message"> 
                 <Checkbox
                   size="large"
@@ -288,6 +302,17 @@ export default function Contacts() {
                   id="country"
                   data={countries}
                   defaultValue={currentContact.country}
+                />
+              </FormField>
+
+              <FormField label="Stage" editorId="stage"> 
+                <DropDownList
+                  name="stage"
+                  id="stage"
+                  textField="label"
+                  dataItemKey="value"
+                  data={stages}
+                  defaultValue={Stage.fromValue(currentContact.stage)}
                 />
               </FormField>
 

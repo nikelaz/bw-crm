@@ -41,9 +41,9 @@ const items = [
     route: "/emails",
   },
   {
-    text: "Pipeline",
+    text: "Leads Board",
     svgIcon: columnsIcon,
-    route: "/pipeline",
+    route: "/leads-board",
   },
 ];
 
