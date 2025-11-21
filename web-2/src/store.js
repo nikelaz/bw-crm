@@ -33,6 +33,26 @@ export const useStore = create((set, get) => ({
       .slice(0, limit);
   },
 
+  updateContact: (id, updates) => {
+    const contacts = get().contacts;
+    console.log('update', id);
+
+    for (let i = 0; i < contacts.length; i++) {
+      if (contacts[i].id === id) {
+        console.log('updating contact');
+        console.log('updates', updates);
+        contacts[i] = {
+          ...contacts[i],
+          ...updates
+        };
+      }
+    }
+
+    console.log('contacts');
+
+    set({ contacts });
+  },
+
   getPopularCountries: (limit = 10) => {
     const contacts = get().contacts;
 

@@ -1,11 +1,10 @@
 import PageTitle from "../components/page-title";
 import MainLayout from "../components/main-layout";
 import { ListLayout, ListLayoutHeader } from "../components/list-layout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "../store";
 import {
   ListBox,
-  processListBoxData,
   processListBoxDragAndDrop
 } from "@progress/kendo-react-listbox";
 import {
@@ -20,9 +19,23 @@ const transformContact = (contact) => ({
   selected: false,
 }); 
 
+const ListBoxItem = (props) => {
+  let { dataItem, selected, ...others } = props;
+  return (
+    <li {...others}>
+      <div>
+        <div>{dataItem.first_name} {dataItem.last_name}</div>
+        <div>{dataItem.email}</div>
+        <div>Company Name</div>
+      </div>
+    </li>
+  );
+};
+
 export default function LeadsBoard() {
   const contacts = useStore(state => state.contacts);
- 
+  const updateContact = useStore(state => state.updateContact);
+
   const newLeads = [];
   const contacted = [];
   const qualified = [];
@@ -43,7 +56,7 @@ export default function LeadsBoard() {
         disqualified.push(transformContact(contact));
     }
   });
-
+   
   const [state, setState] = useState({
     newLeads,
     contacted,
@@ -80,8 +93,6 @@ export default function LeadsBoard() {
   };
 
   const handleDragStart = e => {
-    let target = e.target;
-    e.dataItem.dataCollection = target.props.id || '';
     setState({
       ...state,
       draggedItem: e.dataItem
@@ -90,15 +101,24 @@ export default function LeadsBoard() {
 
   const handleDrop = e => {
     let target = e.target;
-    let dragItemData = state.draggedItem.dataCollection;
-    console.log('drag', dragItemData);
-    let dropItemData = target.props.id;
-    console.log('dropItemData', dropItemData);
-    let result = processListBoxDragAndDrop(state[dragItemData], state[dropItemData], state.draggedItem, e.dataItem, 'id');
+    let dragItemData = state.draggedItem;
+    let dragItemStage = dragItemData.stage;
+    if (dragItemData.stage === stages.NEW) {
+      dragItemStage = "newLeads";
+    }
+
+    let dropItemStage = target.props.name;
+    dragItemData.stage = dropItemStage === "newLeads" ? stages.NEW : dropItemStage; 
+    let result = processListBoxDragAndDrop(state[dragItemStage], state[dropItemStage], state.draggedItem, e.dataItem, 'id');
+
     setState({
       ...state,
-      [dragItemData]: result.listBoxOneData,
-      [dropItemData]: result.listBoxTwoData
+      [dragItemStage]: result.listBoxOneData,
+      [dropItemStage]: result.listBoxTwoData
+    });
+
+    updateContact(dragItemData.id, {
+      stage: dropItemStage === "newLeads" ? stages.NEW : dropItemStage
     });
   };
 
@@ -113,7 +133,7 @@ export default function LeadsBoard() {
           <Stage
             title="New Leads"
             data={state.newLeads}
-            stage={stages.NEW}
+            stage="newLeads"
             handleDragStart={handleDragStart}
             handleDrop={handleDrop}
             handleItemClick={e => handleItemClick(
@@ -165,6 +185,7 @@ const Stage = (props) => {
           height: '100%',
           width: '100%'
         }}
+        item={ListBoxItem}
         data={props.data}
         textField="email"
         selectedField={SELECTED_FIELD}
